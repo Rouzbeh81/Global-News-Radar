@@ -21,7 +21,7 @@ app.get('/api/search', async (req, res) => {
     return res.status(400).json({ error: 'Query parameter q is required' });
   }
 
-  const cacheKey = `search:v2:${q}:${t}`;
+  const cacheKey = `search:v5:${q}:${t}`;
   const cachedData = await CacheService.get(cacheKey);
   if (cachedData) {
     return res.json(cachedData);
