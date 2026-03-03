@@ -13,6 +13,8 @@ const elements = {
     loader: document.getElementById('loader'),
     themeToggle: document.getElementById('theme-toggle'),
     filterSource: document.getElementById('filter-source'),
+    filterRegion: document.getElementById('filter-region'),
+    filterSentiment: document.getElementById('filter-sentiment'),
     autoRefreshToggle: document.getElementById('auto-refresh-toggle'),
     refreshInterval: document.getElementById('refresh-interval'),
     nextRefreshBox: document.getElementById('next-refresh'),
@@ -71,10 +73,20 @@ const renderArticles = (articles) => {
 
 const handleFilter = () => {
     const filterTerm = elements.filterSource.value.toLowerCase();
-    const filtered = currentArticles.filter(a =>
-        a.source.toLowerCase().includes(filterTerm) ||
-        a.title.toLowerCase().includes(filterTerm)
-    );
+    const regionFilter = elements.filterRegion.value;
+    const sentimentFilter = elements.filterSentiment.value;
+
+    const filtered = currentArticles.filter(a => {
+        const matchesTerm = a.source.toLowerCase().includes(filterTerm) ||
+                            a.title.toLowerCase().includes(filterTerm) ||
+                            (a.summary && a.summary.toLowerCase().includes(filterTerm));
+
+        const matchesRegion = !regionFilter || a.region === regionFilter;
+        const matchesSentiment = !sentimentFilter || a.sentiment === sentimentFilter;
+
+        return matchesTerm && matchesRegion && matchesSentiment;
+    });
+
     renderArticles(filtered);
 };
 
@@ -127,6 +139,8 @@ elements.themeToggle.addEventListener('click', () => {
 });
 
 elements.filterSource.addEventListener('input', handleFilter);
+elements.filterRegion.addEventListener('change', handleFilter);
+elements.filterSentiment.addEventListener('change', handleFilter);
 
 elements.autoRefreshToggle.addEventListener('change', () => {
     elements.refreshInterval.disabled = !elements.autoRefreshToggle.checked;
