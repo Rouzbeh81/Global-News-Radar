@@ -38,7 +38,7 @@ app.get('/api/search', async (req, res) => {
       query: q,
       timeframe: t,
       totalSourcesQueried: 15,
-      totalArticles: articles.length,
+      totalArticles: result.articles.length,
       ...result,
       timestamp: new Date().toISOString()
     };

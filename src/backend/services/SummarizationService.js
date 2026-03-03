@@ -49,14 +49,16 @@ class SummarizationService {
       1. A consolidated "globalSummary" (3-4 sentences).
       2. A "sentimentOverview" (STRICTLY one of: "Positive", "Neutral", "Critical").
       3. A "regionalAnalysis" (how sentiment/coverage varies by region: Europe, Middle East, North America).
-      4. For each article, provide a 1-sentence "shortSummary" and a "sentiment" label (STRICTLY one of: "Positive", "Neutral", "Critical").
+      4. For each article, provide a 1-sentence "shortSummary", a "sentiment" label (STRICTLY one of: "Positive", "Neutral", "Critical"), and a "isRelevant" boolean (STRICTLY true/false).
+
+      IMPORTANT: If an article is unrelated to "${query}", set "isRelevant": false.
 
       Return ONLY a JSON object with this structure:
       {
         "globalSummary": "...",
         "sentimentOverview": "Positive | Neutral | Critical",
         "regionalAnalysis": "...",
-        "articles": [{"title": "...", "shortSummary": "...", "sentiment": "Positive | Neutral | Critical"}]
+        "articles": [{"title": "...", "shortSummary": "...", "sentiment": "Positive | Neutral | Critical", "isRelevant": true}]
       }
     `;
 
@@ -75,15 +77,21 @@ class SummarizationService {
         return this.fallbackSummaries(articles, "Invalid AI response format");
       }
 
-      // Merge results back to articles
+      // Merge results back to articles and filter by AI relevance
       const enrichedArticles = articles.map(art => {
-        const enriched = Array.isArray(result.articles) && result.articles.find(r => r && (r.title === art.title || art.title.includes(r.title)));
+        const enriched = Array.isArray(result.articles) && result.articles.find(r => r && (r.title === art.title || art.title.includes(r.title) || (typeof r.title === 'string' && art.title.includes(r.title))));
+
+        // If LLM says not relevant, we'll mark it for removal or keep description
+        const isRelevant = enriched ? enriched.isRelevant !== false : true;
+
+        if (!isRelevant) return null;
+
         return {
           ...art,
           summary: enriched && typeof enriched.shortSummary === 'string' ? enriched.shortSummary : (art.description || art.title),
           sentiment: enriched && typeof enriched.sentiment === 'string' ? enriched.sentiment : 'Neutral'
         };
-      });
+      }).filter(Boolean);
 
       // Robustly handle regionalAnalysis if it's an object
       let regionalAnalysis = result.regionalAnalysis || "Analysis not available.";

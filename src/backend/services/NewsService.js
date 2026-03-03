@@ -19,8 +19,17 @@ class NewsService {
     const results = await Promise.all(fetchPromises);
     const flattened = _.flatten(results);
 
+    // Initial keyword filter on title/description to reduce noise
+    const keywords = query.toLowerCase().split(' ').filter(k => k.length > 2);
+    const filteredResults = flattened.filter(a => {
+      const title = a.title.toLowerCase();
+      const desc = (a.description || '').toLowerCase();
+      // Article must contain at least one significant word from the query
+      return keywords.some(k => title.includes(k) || desc.includes(k));
+    });
+
     // Deduplicate by URL and fuzzy title similarity
-    const uniqueArticles = this.deduplicate(flattened);
+    const uniqueArticles = this.deduplicate(filteredResults);
 
     // Sort by publish date descending
     return _.orderBy(uniqueArticles, ['publishedAt'], ['desc']);

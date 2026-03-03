@@ -15,7 +15,9 @@ class GoogleNewsAdapter extends BaseAdapter {
     else if (timeframe === '1h') when = '1h';
     else if (timeframe === '24h') when = '1d';
 
-    const searchQuery = encodeURIComponent(`${query} source:"${this.sourceSearchTag}" when:${when}`);
+    // Quote query if it contains spaces to ensure exact match, otherwise just use it
+    const formattedQuery = query.includes(' ') ? `"${query}"` : query;
+    const searchQuery = encodeURIComponent(`${formattedQuery} source:"${this.sourceSearchTag}" when:${when}`);
     const url = `https://news.google.com/rss/search?q=${searchQuery}&hl=en-US&gl=US&ceid=US:en`;
 
     try {
