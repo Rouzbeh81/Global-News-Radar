@@ -32,13 +32,16 @@ const performSearch = async () => {
         const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&t=${timeframe}`);
         const data = await response.json();
 
-        if (data.error) throw new Error(data.error);
+        if (data.error) {
+            console.error('API Error:', data.message || data.error);
+            throw new Error(data.message || data.error);
+        }
 
         currentArticles = data.articles;
         displayResults(data);
     } catch (error) {
         console.error('Search failed:', error);
-        alert('Failed to retrieve news intelligence. Please try again.');
+        alert(`Failed to retrieve news intelligence: ${error.message}. Please try again.`);
     } finally {
         elements.loader.classList.add('hidden');
     }

@@ -11,8 +11,13 @@ class CacheService {
 
   async get(key) {
     if (this.redis) {
-      const val = await this.redis.get(key);
-      return val ? JSON.parse(val) : null;
+      try {
+        const val = await this.redis.get(key);
+        return val ? JSON.parse(val) : null;
+      } catch (err) {
+        console.error("Redis Get Error:", err);
+        return null;
+      }
     }
     const entry = this.memoryCache.get(key);
     if (entry && entry.expiry > Date.now()) {
@@ -23,7 +28,11 @@ class CacheService {
 
   async set(key, value, ttlSeconds = 3600) {
     if (this.redis) {
-      await this.redis.set(key, JSON.stringify(value), 'EX', ttlSeconds);
+      try {
+        await this.redis.set(key, JSON.stringify(value), 'EX', ttlSeconds);
+      } catch (err) {
+        console.error("Redis Set Error:", err);
+      }
     } else {
       this.memoryCache.set(key, {
         value,

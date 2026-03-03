@@ -7,7 +7,7 @@ export const renderArticle = (article) => {
                 <span class="tag">${article.sentiment || 'Neutral'}</span>
             </div>
             <h4><a href="${article.url}" target="_blank" rel="noopener">${article.title}</a></h4>
-            <div class="meta">${new Date(article.publishedAt).toLocaleString()}</div>
+            <div class="meta">${article.author ? 'By ' + article.author + ' | ' : ''}${new Date(article.publishedAt).toLocaleString()}</div>
             <p>${article.summary || article.description || 'No summary available.'}</p>
         </article>
     `;

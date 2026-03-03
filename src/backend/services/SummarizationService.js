@@ -5,9 +5,11 @@ const Groq = require('groq-sdk');
  */
 class SummarizationService {
   constructor() {
-    this.groq = new Groq({
-      apiKey: process.env.GROQ_API_KEY
-    });
+    if (process.env.GROQ_API_KEY) {
+      this.groq = new Groq({
+        apiKey: process.env.GROQ_API_KEY
+      });
+    }
   }
 
   /**
@@ -17,12 +19,16 @@ class SummarizationService {
    * @returns {Promise<Object>} Enriched data with summaries and analysis
    */
   async generateSummaries(articles, query) {
-    if (!articles || articles.length === 0) return { globalSummary: "No articles found.", sentimentOverview: "N/A", articles: [] };
+    if (!articles || articles.length === 0) {
+      return { globalSummary: "No articles found.", sentimentOverview: "N/A", articles: [] };
+    }
 
-    // Group articles for efficient batch processing if needed, but for MVP we do a global summary
-    // and extract individual insights in one or two calls.
+    if (!this.groq) {
+      console.warn("GROQ_API_KEY not configured. Using fallback summarization.");
+      return this.fallbackSummaries(articles);
+    }
 
-    const articleData = articles.slice(0, 10).map(a => ({
+    const articleData = articles.slice(0, 15).map(a => ({
       source: a.source,
       title: a.title,
       region: a.region
@@ -58,30 +64,42 @@ class SummarizationService {
 
       // Merge results back to articles
       const enrichedArticles = articles.map(art => {
-        const enriched = result.articles.find(r => r.title === art.title);
+        const enriched = result.articles && result.articles.find(r => r.title === art.title);
         return {
           ...art,
-          summary: enriched ? enriched.shortSummary : art.description,
+          summary: enriched ? enriched.shortSummary : (art.description || art.title),
           sentiment: enriched ? enriched.sentiment : 'Neutral'
         };
       });
 
       return {
-        globalSummary: result.globalSummary,
-        sentimentOverview: result.sentimentOverview,
-        regionalAnalysis: result.regionalAnalysis,
+        globalSummary: result.globalSummary || "Summary generation failed.",
+        sentimentOverview: result.sentimentOverview || "Mixed",
+        regionalAnalysis: result.regionalAnalysis || "Analysis not available.",
         articles: enrichedArticles
       };
     } catch (error) {
       console.error("Summarization failed:", error);
-      // Fallback
-      return {
-        globalSummary: "Summary unavailable due to technical error.",
-        sentimentOverview: "Unknown",
-        regionalAnalysis: "Analysis unavailable.",
-        articles: articles.map(a => ({ ...a, summary: a.description, sentiment: 'Unknown' }))
-      };
+      return this.fallbackSummaries(articles);
     }
+  }
+
+  /**
+   * Fallback extractive summarization if LLM is unavailable
+   * @param {Array<Object>} articles
+   * @returns {Object}
+   */
+  fallbackSummaries(articles) {
+    return {
+      globalSummary: "Intelligence aggregation complete. (AI Summarization currently unavailable)",
+      sentimentOverview: "Neutral",
+      regionalAnalysis: "Geographic distribution analyzed across " + [...new Set(articles.map(a => a.region))].join(', '),
+      articles: articles.map(a => ({
+        ...a,
+        summary: a.description || a.title,
+        sentiment: 'Neutral'
+      }))
+    };
   }
 }
 

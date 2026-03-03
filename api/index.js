@@ -48,7 +48,11 @@ app.get('/api/search', async (req, res) => {
     res.json(response);
   } catch (error) {
     console.error('API Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
