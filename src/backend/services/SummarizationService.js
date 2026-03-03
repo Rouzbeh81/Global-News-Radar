@@ -32,7 +32,7 @@ class SummarizationService {
 
     if (!this.groq) {
       console.warn("GROQ_API_KEY not configured. Using fallback summarization.");
-      return this.fallbackSummaries(articles);
+      return this.fallbackSummaries(articles, "Missing API Key");
     }
 
     const articleData = articles.slice(0, 15).map(a => ({
@@ -86,19 +86,20 @@ class SummarizationService {
         articles: enrichedArticles
       };
     } catch (error) {
-      console.error("Summarization failed:", error);
-      return this.fallbackSummaries(articles);
+      console.error("Summarization failed:", error.message);
+      return this.fallbackSummaries(articles, error.message);
     }
   }
 
   /**
    * Fallback extractive summarization if LLM is unavailable
    * @param {Array<Object>} articles
+   * @param {string} reason
    * @returns {Object}
    */
-  fallbackSummaries(articles) {
+  fallbackSummaries(articles, reason = "") {
     return {
-      globalSummary: "Intelligence aggregation complete. (AI Summarization currently unavailable)",
+      globalSummary: `Intelligence aggregation complete. (AI Summarization currently unavailable${reason ? ': ' + reason : ''})`,
       sentimentOverview: "Neutral",
       regionalAnalysis: "Geographic distribution analyzed across " + [...new Set(articles.map(a => a.region))].join(', '),
       articles: articles.map(a => ({
