@@ -25,18 +25,20 @@
                 </select>
                 <button id="search-btn">Search</button>
             </div>
-            <div class="refresh-controls">
-                <label class="toggle-container">
-                    <input type="checkbox" id="auto-refresh-toggle">
-                    <span class="toggle-label">Auto-Refresh</span>
-                </label>
-                <select id="refresh-interval" disabled>
-                    <option value="300000">Every 5 Min</option>
-                    <option value="900000">Every 15 Min</option>
-                    <option value="1800000" selected>Every 30 Min</option>
-                    <option value="3600000">Every 1 Hour</option>
-                </select>
-                <span id="next-refresh" class="hidden">Next refresh in: <span id="timer-val">--:--</span></span>
+            <div class="controls-row">
+                <div class="refresh-controls">
+                    <label class="toggle-container">
+                        <input type="checkbox" id="auto-refresh-toggle">
+                        <span class="toggle-label">Auto-Refresh</span>
+                    </label>
+                    <select id="refresh-interval" disabled>
+                        <option value="300000">Every 5 Min</option>
+                        <option value="900000">Every 15 Min</option>
+                        <option value="1800000" selected>Every 30 Min</option>
+                        <option value="3600000">Every 1 Hour</option>
+                    </select>
+                    <span id="next-refresh" class="hidden">Next refresh in: <span id="timer-val">--:--</span></span>
+                </div>
             </div>
         </section>
 
@@ -66,21 +68,33 @@
             </div>
 
             <div class="filters-bar">
-                <h3>Articles</h3>
+                <div class="filter-header">
+                    <h3>Aggregated Articles</h3>
+                    <button id="clear-filters" class="btn-small hidden">Clear Filters</button>
+                </div>
                 <div class="filter-controls">
-                    <input type="text" id="filter-source" placeholder="Search in results...">
-                    <select id="filter-region">
-                        <option value="">All Regions</option>
-                        <option value="Europe">Europe</option>
-                        <option value="Middle East">Middle East</option>
-                        <option value="North America">North America</option>
-                    </select>
-                    <select id="filter-sentiment">
-                        <option value="">All Sentiments</option>
-                        <option value="Positive">Positive</option>
-                        <option value="Neutral">Neutral</option>
-                        <option value="Critical">Critical</option>
-                    </select>
+                    <div class="filter-group">
+                        <label for="filter-source">Keyword</label>
+                        <input type="text" id="filter-source" placeholder="Search in results...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-region">Region</label>
+                        <select id="filter-region">
+                            <option value="">All Regions</option>
+                            <option value="Europe">Europe</option>
+                            <option value="Middle East">Middle East</option>
+                            <option value="North America">North America</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filter-sentiment">Sentiment</label>
+                        <select id="filter-sentiment">
+                            <option value="">All Sentiments</option>
+                            <option value="Positive">Positive</option>
+                            <option value="Neutral">Neutral</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 

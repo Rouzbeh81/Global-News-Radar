@@ -47,16 +47,16 @@ class SummarizationService {
 
       Provide:
       1. A consolidated "globalSummary" (3-4 sentences).
-      2. A "sentimentOverview" (descriptive label like "Critical", "Optimistic", "Neutral").
+      2. A "sentimentOverview" (STRICTLY one of: "Positive", "Neutral", "Critical").
       3. A "regionalAnalysis" (how sentiment/coverage varies by region: Europe, Middle East, North America).
-      4. For each article, provide a 1-sentence "shortSummary" and a "sentiment" label.
+      4. For each article, provide a 1-sentence "shortSummary" and a "sentiment" label (STRICTLY one of: "Positive", "Neutral", "Critical").
 
       Return ONLY a JSON object with this structure:
       {
         "globalSummary": "...",
-        "sentimentOverview": "...",
+        "sentimentOverview": "Positive | Neutral | Critical",
         "regionalAnalysis": "...",
-        "articles": [{"title": "...", "shortSummary": "...", "sentiment": "..."}]
+        "articles": [{"title": "...", "shortSummary": "...", "sentiment": "Positive | Neutral | Critical"}]
       }
     `;
 

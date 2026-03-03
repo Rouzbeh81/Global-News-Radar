@@ -15,6 +15,7 @@ const elements = {
     filterSource: document.getElementById('filter-source'),
     filterRegion: document.getElementById('filter-region'),
     filterSentiment: document.getElementById('filter-sentiment'),
+    clearFiltersBtn: document.getElementById('clear-filters'),
     autoRefreshToggle: document.getElementById('auto-refresh-toggle'),
     refreshInterval: document.getElementById('refresh-interval'),
     nextRefreshBox: document.getElementById('next-refresh'),
@@ -68,13 +69,16 @@ const displayResults = (data) => {
 };
 
 const renderArticles = (articles) => {
-    elements.articlesList.innerHTML = articles.map(renderArticle).join('');
+    elements.articlesList.innerHTML = articles.map((a, i) => renderArticle(a, i)).join('');
 };
 
 const handleFilter = () => {
     const filterTerm = elements.filterSource.value.toLowerCase();
     const regionFilter = elements.filterRegion.value;
     const sentimentFilter = elements.filterSentiment.value;
+
+    const hasActiveFilters = filterTerm || regionFilter || sentimentFilter;
+    elements.clearFiltersBtn.classList.toggle('hidden', !hasActiveFilters);
 
     const filtered = currentArticles.filter(a => {
         const matchesTerm = a.source.toLowerCase().includes(filterTerm) ||
@@ -88,6 +92,13 @@ const handleFilter = () => {
     });
 
     renderArticles(filtered);
+};
+
+const clearFilters = () => {
+    elements.filterSource.value = '';
+    elements.filterRegion.value = '';
+    elements.filterSentiment.value = '';
+    handleFilter();
 };
 
 const startRefreshTimer = () => {
@@ -141,6 +152,7 @@ elements.themeToggle.addEventListener('click', () => {
 elements.filterSource.addEventListener('input', handleFilter);
 elements.filterRegion.addEventListener('change', handleFilter);
 elements.filterSentiment.addEventListener('change', handleFilter);
+elements.clearFiltersBtn.addEventListener('click', clearFilters);
 
 elements.autoRefreshToggle.addEventListener('change', () => {
     elements.refreshInterval.disabled = !elements.autoRefreshToggle.checked;
