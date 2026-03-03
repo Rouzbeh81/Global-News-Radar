@@ -1,0 +1,24 @@
+{
+  "name": "global-news-radar",
+  "version": "1.0.0",
+  "description": "Topic driven global news intelligence tool",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js",
+    "dev": "nodemon api/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "rss-parser": "^3.13.0",
+    "groq-sdk": "^0.3.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ioredis": "^5.3.2",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

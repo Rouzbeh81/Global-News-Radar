@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global News Radar | Intelligence Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dark-mode">
+    <header>
+        <div class="container">
+            <h1>Global News Radar</h1>
+            <button id="theme-toggle" aria-label="Toggle Dark/Light Mode">🌓</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="search-section">
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Enter topic or keyword..." aria-label="Search topic">
+                <select id="timeframe-select">
+                    <option value="24h" selected>Last 24 Hours</option>
+                    <option value="1h">Last 1 Hour</option>
+                    <option value="15min">Last 15 Minutes</option>
+                </select>
+                <button id="search-btn">Search</button>
+            </div>
+        </section>
+
+        <div id="loader" class="hidden">
+            <div class="spinner"></div>
+            <p>Gathering global intelligence...</p>
+        </div>
+
+        <section id="results-section" class="hidden">
+            <div id="dashboard-summary" class="summary-card">
+                <h2>Intelligence Executive Summary</h2>
+                <p id="global-summary-text"></p>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <label>Sentiment</label>
+                        <span id="sentiment-val">Neutral</span>
+                    </div>
+                    <div class="stat-item">
+                        <label>Sources</label>
+                        <span id="sources-count">0</span>
+                    </div>
+                </div>
+                <div id="regional-analysis-box" class="analysis-box">
+                    <h3>Regional Analysis</h3>
+                    <p id="regional-analysis-text"></p>
+                </div>
+            </div>
+
+            <div class="filters-bar">
+                <h3>Articles</h3>
+                <div class="filter-controls">
+                    <input type="text" id="filter-source" placeholder="Filter by source...">
+                </div>
+            </div>
+
+            <div id="articles-list" class="articles-grid">
+                <!-- Articles will be injected here -->
+            </div>
+        </section>
+    </main>
+
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>
