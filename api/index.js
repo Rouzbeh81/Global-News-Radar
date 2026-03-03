@@ -1,10 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const NewsService = require('../src/backend/services/NewsService');
 const SummarizationService = require('../src/backend/services/SummarizationService');
 const CacheService = require('../src/backend/services/CacheService');
-require('dotenv').config();
 
 const app = express();
 

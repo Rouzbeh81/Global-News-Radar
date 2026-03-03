@@ -23,6 +23,13 @@ class SummarizationService {
       return { globalSummary: "No articles found.", sentimentOverview: "N/A", articles: [] };
     }
 
+    // Lazy initialization of Groq client if not already done
+    if (!this.groq && process.env.GROQ_API_KEY) {
+      this.groq = new Groq({
+        apiKey: process.env.GROQ_API_KEY
+      });
+    }
+
     if (!this.groq) {
       console.warn("GROQ_API_KEY not configured. Using fallback summarization.");
       return this.fallbackSummaries(articles);
