@@ -11,7 +11,7 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static('.'));
 
 // API Route
 app.get('/api/search', async (req, res) => {
