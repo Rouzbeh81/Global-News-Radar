@@ -12,21 +12,29 @@ const elements = {
     regionalAnalysisText: document.getElementById('regional-analysis-text'),
     loader: document.getElementById('loader'),
     themeToggle: document.getElementById('theme-toggle'),
-    filterSource: document.getElementById('filter-source')
+    filterSource: document.getElementById('filter-source'),
+    autoRefreshToggle: document.getElementById('auto-refresh-toggle'),
+    refreshInterval: document.getElementById('refresh-interval'),
+    nextRefreshBox: document.getElementById('next-refresh'),
+    timerVal: document.getElementById('timer-val')
 };
 
 let currentArticles = [];
+let countdownTimer = null;
+let timeRemaining = 0;
 
-const performSearch = async () => {
+const performSearch = async (isAuto = false) => {
     const query = elements.searchInput.value.trim();
     const timeframe = elements.timeframeSelect.value;
 
     if (!query) return;
 
-    // UI Reset
-    elements.resultsSection.classList.add('hidden');
+    // UI Reset if manual search
+    if (!isAuto) {
+        elements.resultsSection.classList.add('hidden');
+        elements.articlesList.innerHTML = '';
+    }
     elements.loader.classList.remove('hidden');
-    elements.articlesList.innerHTML = '';
 
     try {
         const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&t=${timeframe}`);
@@ -70,10 +78,48 @@ const handleFilter = () => {
     renderArticles(filtered);
 };
 
+const startRefreshTimer = () => {
+    stopRefreshTimer();
+    if (!elements.autoRefreshToggle.checked) return;
+
+    const interval = parseInt(elements.refreshInterval.value);
+    timeRemaining = interval / 1000;
+
+    elements.nextRefreshBox.classList.remove('hidden');
+    updateTimerDisplay();
+
+    countdownTimer = setInterval(() => {
+        timeRemaining--;
+        if (timeRemaining <= 0) {
+            performSearch(true);
+            timeRemaining = interval / 1000;
+        }
+        updateTimerDisplay();
+    }, 1000);
+};
+
+const stopRefreshTimer = () => {
+    if (countdownTimer) clearInterval(countdownTimer);
+    elements.nextRefreshBox.classList.add('hidden');
+};
+
+const updateTimerDisplay = () => {
+    const mins = Math.floor(timeRemaining / 60);
+    const secs = timeRemaining % 60;
+    elements.timerVal.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
 // Event Listeners
-elements.searchBtn.addEventListener('click', performSearch);
+elements.searchBtn.addEventListener('click', () => {
+    performSearch();
+    if (elements.autoRefreshToggle.checked) startRefreshTimer();
+});
+
 elements.searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') performSearch();
+    if (e.key === 'Enter') {
+        performSearch();
+        if (elements.autoRefreshToggle.checked) startRefreshTimer();
+    }
 });
 
 elements.themeToggle.addEventListener('click', () => {
@@ -81,3 +127,14 @@ elements.themeToggle.addEventListener('click', () => {
 });
 
 elements.filterSource.addEventListener('input', handleFilter);
+
+elements.autoRefreshToggle.addEventListener('change', () => {
+    elements.refreshInterval.disabled = !elements.autoRefreshToggle.checked;
+    if (elements.autoRefreshToggle.checked) {
+        startRefreshTimer();
+    } else {
+        stopRefreshTimer();
+    }
+});
+
+elements.refreshInterval.addEventListener('change', startRefreshTimer);

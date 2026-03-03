@@ -25,6 +25,19 @@
                 </select>
                 <button id="search-btn">Search</button>
             </div>
+            <div class="refresh-controls">
+                <label class="toggle-container">
+                    <input type="checkbox" id="auto-refresh-toggle">
+                    <span class="toggle-label">Auto-Refresh</span>
+                </label>
+                <select id="refresh-interval" disabled>
+                    <option value="300000">Every 5 Min</option>
+                    <option value="900000">Every 15 Min</option>
+                    <option value="1800000" selected>Every 30 Min</option>
+                    <option value="3600000">Every 1 Hour</option>
+                </select>
+                <span id="next-refresh" class="hidden">Next refresh in: <span id="timer-val">--:--</span></span>
+            </div>
         </section>
 
         <div id="loader" class="hidden">
