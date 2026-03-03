@@ -47,6 +47,23 @@ header .container {
 
 h1 { margin: 0; font-size: 1.5rem; color: var(--primary-color); }
 
+.logo-text {
+    background: linear-gradient(to right, #239f40 0%, #239f40 33.3%, #ffffff 33.3%, #ffffff 66.6%, #da2b2b 66.6%, #da2b2b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% auto;
+    animation: shine 4s linear infinite;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
 button#theme-toggle {
     background: none;
     border: 1px solid var(--border-color);
