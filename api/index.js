@@ -21,7 +21,7 @@ app.get('/api/search', async (req, res) => {
     return res.status(400).json({ error: 'Query parameter q is required' });
   }
 
-  const cacheKey = `search:${q}:${t}`;
+  const cacheKey = `search:v2:${q}:${t}`;
   const cachedData = await CacheService.get(cacheKey);
   if (cachedData) {
     return res.json(cachedData);
@@ -39,11 +39,15 @@ app.get('/api/search', async (req, res) => {
       timeframe: t,
       totalSourcesQueried: 15,
       totalArticles: articles.length,
-      ...result
+      ...result,
+      timestamp: new Date().toISOString()
     };
 
-    // 3. Cache results
-    await CacheService.set(cacheKey, response, 1800); // 30 min cache
+    // 3. Cache results (only if successful AI summary, or shorter TTL for fallbacks)
+    const isFallback = result.globalSummary.includes('(AI Summarization currently unavailable)');
+    const ttl = isFallback ? 60 : 1800; // 1 min for fallback, 30 min for success
+
+    await CacheService.set(cacheKey, response, ttl);
 
     res.json(response);
   } catch (error) {
