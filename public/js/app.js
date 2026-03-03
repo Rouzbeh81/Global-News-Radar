@@ -59,18 +59,24 @@ const performSearch = async (isAuto = false) => {
     }
 };
 
+/**
+ * Safe text setting that handles non-string data
+ */
+const setSafeText = (element, data) => {
+    if (!element) return;
+    if (typeof data === 'object') {
+        element.textContent = JSON.stringify(data, null, 2);
+    } else {
+        element.textContent = String(data || '');
+    }
+};
+
 const displayResults = (data) => {
     elements.dashboardSummary.classList.remove('hidden');
-    elements.globalSummaryText.textContent = data.globalSummary;
-    elements.sentimentVal.textContent = data.sentimentOverview;
-    elements.sourcesCount.textContent = data.totalArticles;
-
-    // Robust display for regional analysis
-    if (typeof data.regionalAnalysis === 'object') {
-        elements.regionalAnalysisText.textContent = JSON.stringify(data.regionalAnalysis, null, 2);
-    } else {
-        elements.regionalAnalysisText.textContent = data.regionalAnalysis;
-    }
+    setSafeText(elements.globalSummaryText, data.globalSummary);
+    setSafeText(elements.sentimentVal, data.sentimentOverview);
+    setSafeText(elements.sourcesCount, data.totalArticles);
+    setSafeText(elements.regionalAnalysisText, data.regionalAnalysis);
 
     renderArticles(data.articles);
 };

@@ -67,30 +67,40 @@ class SummarizationService {
         response_format: { type: 'json_object' }
       });
 
-      const result = JSON.parse(chatCompletion.choices[0].message.content);
+      let result;
+      try {
+        result = JSON.parse(chatCompletion.choices[0].message.content);
+      } catch (pErr) {
+        console.error("JSON Parse Error from Groq:", pErr);
+        return this.fallbackSummaries(articles, "Invalid AI response format");
+      }
 
       // Merge results back to articles
       const enrichedArticles = articles.map(art => {
-        const enriched = result.articles && result.articles.find(r => r.title === art.title);
+        const enriched = Array.isArray(result.articles) && result.articles.find(r => r && (r.title === art.title || art.title.includes(r.title)));
         return {
           ...art,
-          summary: enriched ? enriched.shortSummary : (art.description || art.title),
-          sentiment: enriched ? enriched.sentiment : 'Neutral'
+          summary: enriched && typeof enriched.shortSummary === 'string' ? enriched.shortSummary : (art.description || art.title),
+          sentiment: enriched && typeof enriched.sentiment === 'string' ? enriched.sentiment : 'Neutral'
         };
       });
 
       // Robustly handle regionalAnalysis if it's an object
       let regionalAnalysis = result.regionalAnalysis || "Analysis not available.";
-      if (typeof regionalAnalysis === 'object') {
-        regionalAnalysis = Object.entries(regionalAnalysis)
-          .map(([k, v]) => `${k}: ${v}`)
-          .join('. ');
+      if (regionalAnalysis && typeof regionalAnalysis === 'object') {
+        try {
+          regionalAnalysis = Object.entries(regionalAnalysis)
+            .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+            .join('. ');
+        } catch (sErr) {
+          regionalAnalysis = JSON.stringify(regionalAnalysis);
+        }
       }
 
       return {
-        globalSummary: result.globalSummary || "Summary generation failed.",
-        sentimentOverview: result.sentimentOverview || "Mixed",
-        regionalAnalysis: regionalAnalysis,
+        globalSummary: typeof result.globalSummary === 'string' ? result.globalSummary : "Summary generation failed.",
+        sentimentOverview: typeof result.sentimentOverview === 'string' ? result.sentimentOverview : "Mixed",
+        regionalAnalysis: String(regionalAnalysis),
         articles: enrichedArticles
       };
     } catch (error) {
