@@ -79,10 +79,18 @@ class SummarizationService {
         };
       });
 
+      // Robustly handle regionalAnalysis if it's an object
+      let regionalAnalysis = result.regionalAnalysis || "Analysis not available.";
+      if (typeof regionalAnalysis === 'object') {
+        regionalAnalysis = Object.entries(regionalAnalysis)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join('. ');
+      }
+
       return {
         globalSummary: result.globalSummary || "Summary generation failed.",
         sentimentOverview: result.sentimentOverview || "Mixed",
-        regionalAnalysis: result.regionalAnalysis || "Analysis not available.",
+        regionalAnalysis: regionalAnalysis,
         articles: enrichedArticles
       };
     } catch (error) {

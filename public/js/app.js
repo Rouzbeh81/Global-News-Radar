@@ -5,6 +5,7 @@ const elements = {
     timeframeSelect: document.getElementById('timeframe-select'),
     searchBtn: document.getElementById('search-btn'),
     resultsSection: document.getElementById('results-section'),
+    dashboardSummary: document.getElementById('dashboard-summary'),
     articlesList: document.getElementById('articles-list'),
     globalSummaryText: document.getElementById('global-summary-text'),
     sentimentVal: document.getElementById('sentiment-val'),
@@ -34,7 +35,7 @@ const performSearch = async (isAuto = false) => {
 
     // UI Reset if manual search
     if (!isAuto) {
-        elements.resultsSection.classList.add('hidden');
+        elements.dashboardSummary.classList.add('hidden');
         elements.articlesList.innerHTML = '';
     }
     elements.loader.classList.remove('hidden');
@@ -59,11 +60,17 @@ const performSearch = async (isAuto = false) => {
 };
 
 const displayResults = (data) => {
-    elements.resultsSection.classList.remove('hidden');
+    elements.dashboardSummary.classList.remove('hidden');
     elements.globalSummaryText.textContent = data.globalSummary;
     elements.sentimentVal.textContent = data.sentimentOverview;
     elements.sourcesCount.textContent = data.totalArticles;
-    elements.regionalAnalysisText.textContent = data.regionalAnalysis;
+
+    // Robust display for regional analysis
+    if (typeof data.regionalAnalysis === 'object') {
+        elements.regionalAnalysisText.textContent = JSON.stringify(data.regionalAnalysis, null, 2);
+    } else {
+        elements.regionalAnalysisText.textContent = data.regionalAnalysis;
+    }
 
     renderArticles(data.articles);
 };
